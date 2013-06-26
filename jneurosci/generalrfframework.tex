@@ -83,6 +83,8 @@ We use a
 
 \subsection{Estimating parameter posteriors using ABC}
 
+If the distance metric $\rho(X,D)$ relies on summary statistics of $X$ and $D$, ABC will still recover the true posterior in the limit of $\epsilon=0$. Because computationally we must use $\epsilon > 0$, the estimated posterior will be approximate only. Additionally, in our case we are relying on statistics of $D$ reported in the literature, and there is no way to determine if they are sufficient--indeed that seems unlikely. Hence our posterior estimates will be affected by this additional level of approximation, in a way that is hard to predict. This is an unavoidable limitation at present. However, the statistics reported in the experimental literature were chosen with the aim to be informative, and hence it is assumed that they present a rich summary of the data.
+
 \subsection{Training data to simulate plasticity experiments}
 \subsubsection{Vision}
 \subsubsection{Audition}
