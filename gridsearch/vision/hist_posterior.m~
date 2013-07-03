@@ -1,0 +1,5 @@
+epsilon = 2;
+
+D = sum(y,2);
+
+x_pos = x(D < epsilon,:);

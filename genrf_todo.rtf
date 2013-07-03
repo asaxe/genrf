@@ -11,4 +11,17 @@ make it easy to launch a big server job--possibly modify blam to make it more us
 What would this look like, best case? you provide a list of parameters, and it goes and runs it? communicate through files? how it is now, you communicate through a matlab .mat file with a special struct that has all params for the experiments. sort of nice but sort of overkill.\
 train some vision datasets\
 get the analysis incorporated\
-get a basic ABC posterior analysis going}
+get a basic ABC posterior analysis going\
+\
+\
+\
+Can I reuse the data I have already simulated? \
+would like a big set of matrices\
+X has the inputs [weight decay, etc]\
+Y has the outputs [L1 distances, etc]\
+try it first with the ica data\
+\
+seemed to work pretty well--already yielded some interesting tradeoffs\
+observation, though, that even 600 samples gave a very mediocre rendition of the true posterior. This to me implies that we would do well to try ABCDE. I think I'll try this, focusing on K-means. Need to write a good matlab implementation of ABCDE. We'd get something more like 60,000 samples once the cluster is back up.\
+\
+12*8}
