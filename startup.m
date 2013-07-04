@@ -1,0 +1,8 @@
+addpath('~/genrf/abc')
+addpath('~/genrf/algorithms')
+addpath('~/genrf/utilities')
+addpath('~/genrf/lib/nis')
+addpath('~/genrf/preprocessing')
+addpath('~/genrf/analysis')
+addpath('~/genrf/analysis/vision')
+addpath('~/genrf/mains')
