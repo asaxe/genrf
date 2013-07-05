@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  26 JUN 2013 21:30
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  4 JUL 2013 16:11
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -237,37 +237,40 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 58.
 
 
-LaTeX Warning: Citation `...' undefined on input line 62.
+LaTeX Warning: Citation `...' undefined on input line 67.
 
 [1{/usr/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
 
 ]
-(./generalrfframework.aux)
+[2
+
+] (./generalrfframework.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 2128 strings out of 493633
- 29496 string characters out of 3143378
- 88675 words of memory out of 3000000
+ 2129 strings out of 493633
+ 29503 string characters out of 3143378
+ 89675 words of memory out of 3000000
  5403 multiletter control sequences out of 15000+200000
- 23804 words of font info for 48 fonts, out of 3000000 for 9000
+ 24660 words of font info for 49 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
  37i,9n,23p,1285b,215s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/local/texlive/2011/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/te
 xlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texl
-ive/2011/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2011/te
-xmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/f
-onts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1
-/urw/times/utmri8a.pfb>
-Output written on generalrfframework.pdf (1 page, 55064 bytes).
+ive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texli
+ve/2011/texmf-dist/fonts/type1/urw/symbol/usyr.pfb></usr/local/texlive/2011/tex
+mf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/fo
+nts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/
+urw/times/utmri8a.pfb>
+Output written on generalrfframework.pdf (2 pages, 63706 bytes).
 PDF statistics:
- 33 PDF objects out of 1000 (max. 8388607)
- 23 compressed objects within 1 object stream
+ 40 PDF objects out of 1000 (max. 8388607)
+ 28 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
