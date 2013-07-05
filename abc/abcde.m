@@ -1,104 +1,121 @@
-  
- 
-% Generate data
+function abcde(psi,simul,prior,samp_prior,N,T,burnin,freeze_mask)  
+% ABCDE implementation by Andrew Saxe (asaxe@stanford.edu)
+% after:
+%
+% Turner, B. M., & Sederberg, P. B. (2012). Approximate Bayesian
+% computation with differential evolution. Journal of Mathematical
+% Psychology, 56(5), 375–385. doi:10.1016/j.jmp.2012.06.004
+%
+% w=psi(Es,thetas): function to evaluate particle fitness, accepting
+% E, a vector of the error measure produced by the simulator for
+% each particle, and thetas, a matrix with parameter vectors in the
+% columns, which can contain delta to estimate the error
+% variance
+%
+% E=simul(thetas): function that runs the simulation of all particles
+% for one iteration. Accepts a matrix thetas containing the theta
+% vectors for each particle in the columns. Returns E, the error
+% measure produced for each particle, which in the notation of the
+% paper should be E = D - X. This implementation has not been tested with
+% E as a matrix, with each column containing a vector, i.e., it may
+% need modification if each particle does not just produce one scalar.
+%
+% p=prior(thetas): function that gives probability of parameter
+% vectors under the prior. Thetas contains parameter vectors, one
+% per column. The returned value p should be a row vector of
+% probabilities.
+% 
+% S=samp_prior(N): function that samples N parameter vectors from the
+% prior probability distribution defined by prior(...). Must return
+% the M x N matrix S which has sampled vectors in the columns,
+% where M is the length of the parameter vector.
+%
+% N: number of particles per iteration
+%
+% T: number of iterations (may be inf)   
+%
+% burnin: number of iterations used for the 'burn in' period, in
+% which the parameters of the error function psi are allowed to
+% vary, and the evolution process uses a hill climbing term that
+% rapidly finds high probability regions of the posterior but
+% would bias the posterior if used during the sampling period.
+%
+% freeze_mask: a vector of indices that specify elements of the
+% parameter vector that should be frozen during the sampling period
+%
 
-p=.3; % true value for p
-n=100; % number of trials
-data=rand(n,1) < .3; % generate data
+% Parameter governing small amount of random noise added during
+% crossover step
+epsilon = .001;
+
+% Initialize
+t=1;
+theta = samp_prior(N);
+particle_id = 1:N;
+E = simul(theta,particle_id);
+w = prior(theta).*psi(E,theta);
+accepted = ones(size(w));
+save(sprintf('itr%d.mat',t),'t','theta','E','w','particle_id','accepted');
+
+M = size(theta,1);
 
 
-M=2; % Length of parameter vector theta
-N=100;
-T=100; % number of iterations
-burnin = 50;
-
-delta_prior = 5;
-
-theta=zeros(M,N,T); % declare a vector for storage
-x=zeros(N,T);
-w=zeros(N,T);
-
-D = sum(data)/n;            
-
-
-
-psi=@(p,d) normpdf(p,0,d(2));
-simul=@(p) sum(rand(n,1) < p(1))/n;
-prior=@(p) unifpdf(p(1))*exppdf(p(2),delta_prior);
-samp_prior = @() [unifrnd(0,1); exprnd(delta_prior)];
-
-% initialize
-for i = 1:N
-    theta(:,i,1) = samp_prior();
-    x(i,1) = simul(theta(:,i,1));
-    w(i,1) = 1/N;
-end
-
-
-for t = 2:T % loop over iterations
-    t
+while t < T 
+    t=t+1
+    % Generate proposals theta_star
+    theta_star = zeros(size(theta));
+    particle_id = N*t+1:N*(t+1);
     for i = 1:N
         
         % Crossover update
-        theta_t = theta(:,i,t-1);
+        theta_t = theta(:,i);
         
-        theta_b = theta(:,randsample(1:N,1,true,w(:,t-1)),t-1);
-        tmp = theta(:,randsample(setdiff(1:N,i),2,false),t-1);
+        theta_b = theta(:,randsample(1:N,1,true,w));
+        tmp = theta(:,randsample(setdiff(1:N,i),2,false));
         theta_m = tmp(:,1);
         theta_n = tmp(:,2);
         
         gamma_1 = unifrnd(0.5,1);
         gamma_2 = unifrnd(0.5,1);
-        b = unifrnd(-.001,.001,M,1);
+        b = unifrnd(-epsilon,epsilon,M,1);
         
         if t > burnin
             gamma_2 = 0;
         end
 
-        theta_star = theta_t + gamma_1*(theta_m - theta_n) + ...
+        theta_star(:,i) = theta_t + gamma_1*(theta_m - theta_n) + ...
             gamma_2*(theta_b - theta_t) + b;
 
         if t > burnin
-            theta_star(end) = theta_t(end); % always reset delta
-                                           % during sampling
-        end
-        
-       
-       
-        
-        
-        
-        if prior(theta_star) > 0 % if prior is not > 0, parameters may
-                                 % not make sense. no need to continue.
-            x_samp = simul(theta_star); % simulate data        
-            r = min(1, (psi(D-x_samp,theta_star)*prior(theta_star) ...
-                        ) / (psi(D-x(i,t-1),theta_t)* ...
-                             prior(theta_t)));
-        else
-            r = 0;
+            theta_star(freeze_mask,i) = theta_t(freeze_mask); % always reset frozen parameters
+                                                              % during sampling
         end
 
-
-        if rand() < r
-            theta(:,i,t) = theta_star;
-            x(i,t) = x_samp;
-            
-        else
-            theta(:,i,t) = theta_t;
-            x(i,t) = x(i,t-1);
-        end
         
-        w(i,t) = prior(theta(:,i,t)) * psi(D-x(i,t),theta(:,i,t));
     end
-    w(:,t) = w(:,t)/sum(w(:,t));
+       
+       
+        
+    % Run simulations
+    pr_star = prior(theta_star);
+
+    E_star = simul(theta_star(:,pr_star > 0),particle_id(pr_star > 0));
+    % if prior is not > 0, parameters may not make sense. No need to simulate.
+                                                 
+    % Jump to proposal with metropolis hastings probability r
+    r = zeros(1,N);
+    r(pr_star>0) = min(1, (psi(E_star,theta_star(:,pr_star > 0)).*pr_star(pr_star>0)) ./ (psi(E(pr_star>0),theta(:,pr_star>0)).*prior(theta(:,pr_star>0)) ));
+    r
+    accepted = rand(1,N) < r;
+    theta(:,accepted) = theta_star(:,accepted);
     
+    E(accepted) = E_star(accepted(pr_star > 0));
+
+            
+    w = prior(theta) .* psi(E,theta);
+    w = w/sum(w);
+    
+    % Save iteration results
+    save(sprintf('itr%d.mat',t),'t','theta','E','w','particle_id','accepted');
 end
 
-% Graphing
-binwidth = .02;
-g = 0:binwidth:1;
-samps = squeeze(theta(1,:,burnin:end));
-posterior=hist(samps(:),g);
-bar(g,posterior/sum(posterior)/binwidth,'hist')
-hold on
-plot(g,betapdf(g,sum(data)+1,n-sum(data)+1),'r','linewidth',2)
