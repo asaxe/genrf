@@ -1,5 +1,7 @@
 addpath('~/genrf/abc')
 addpath('~/genrf/algorithms')
+addpath('~/genrf/algorithms/ica')
+addpath('~/genrf/algorithms/kmeans')
 addpath('~/genrf/utilities')
 addpath('~/genrf/lib/nis')
 addpath('~/genrf/preprocessing')

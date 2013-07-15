@@ -1,4 +1,4 @@
-function abcde(psi,simul,prior,samp_prior,N,T,burnin,freeze_mask)  
+function abcde(psi,simul,prior,samp_prior,N,T,burnin,freeze_mask,integer_mask)  
 % ABCDE implementation by Andrew Saxe (asaxe@stanford.edu)
 % after:
 %
@@ -52,7 +52,7 @@ epsilon = .001;
 t=1;
 theta = samp_prior(N);
 particle_id = 1:N;
-E = simul(theta,particle_id);
+E = simul(theta,particle_id,t);
 w = prior(theta).*psi(E,theta);
 accepted = ones(size(w));
 save(sprintf('itr%d.mat',t),'t','theta','E','w','particle_id','accepted');
@@ -64,7 +64,7 @@ while t < T
     t=t+1
     % Generate proposals theta_star
     theta_star = zeros(size(theta));
-    particle_id = N*t+1:N*(t+1);
+    particle_id = N*(t-1)+1:N*t;
     for i = 1:N
         
         % Crossover update
@@ -78,7 +78,7 @@ while t < T
         gamma_1 = unifrnd(0.5,1);
         gamma_2 = unifrnd(0.5,1);
         b = unifrnd(-epsilon,epsilon,M,1);
-        
+                
         if t > burnin
             gamma_2 = 0;
         end
@@ -91,7 +91,7 @@ while t < T
                                                               % during sampling
         end
 
-        
+        theta_star(integer_mask,:) = round(theta_star(integer_mask,:));
     end
        
        
@@ -99,7 +99,7 @@ while t < T
     % Run simulations
     pr_star = prior(theta_star);
 
-    E_star = simul(theta_star(:,pr_star > 0),particle_id(pr_star > 0));
+    E_star = simul(theta_star(:,pr_star > 0),particle_id(pr_star > 0),t);
     % if prior is not > 0, parameters may not make sense. No need to simulate.
                                                  
     % Jump to proposal with metropolis hastings probability r
@@ -111,6 +111,9 @@ while t < T
     
     E(accepted) = E_star(accepted(pr_star > 0));
 
+    if t == burnin
+        theta(freeze_mask,:) = median(theta(freeze_mask,:));
+    end
             
     w = prior(theta) .* psi(E,theta);
     w = w/sum(w);
