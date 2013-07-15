@@ -1,4 +1,4 @@
-function thetas = load_itrs
+function [thetas Es accepteds] = load_itrs
 
 d = dir('itr*.mat');
 load(d(1).name)
@@ -9,5 +9,6 @@ thetas = zeros(M,N,T);
 for i = 1:T
     load(d(i).name);
     thetas(:,:,t) = theta;
-    
+    Es(:,t) = E;
+    accepteds(:,t) = accepted;
 end
