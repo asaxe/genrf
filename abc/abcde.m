@@ -127,6 +127,6 @@ while t < T
     w = w/sum(w);
     
     % Save iteration results
-    save(sprintf('itr%d.mat',t),'t','theta','E','w','particle_id','accepted');
+    save(sprintf('itr%d.mat',t),'t','theta','E','theta_star','E_star','w','particle_id','accepted');
 end
 
