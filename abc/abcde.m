@@ -1,4 +1,5 @@
-function abcde(psi,simul,prior,samp_prior,N,T,burnin,freeze_mask,integer_mask)  
+function abcde(psi,simul,prior,samp_prior,N,T,burnin,freeze_mask, ...
+               integer_mask, restart_itr)  
 % ABCDE implementation by Andrew Saxe (asaxe@stanford.edu)
 % after:
 %
@@ -43,19 +44,26 @@ function abcde(psi,simul,prior,samp_prior,N,T,burnin,freeze_mask,integer_mask)
 % freeze_mask: a vector of indices that specify elements of the
 % parameter vector that should be frozen during the sampling period
 %
+% retart_itr: optional parameter indicating that a run should be
+% restarted from the specified iteration
+% 
 
 % Parameter governing small amount of random noise added during
 % crossover step
 epsilon = .001;
 
 % Initialize
-t=1;
-theta = samp_prior(N);
-particle_id = 1:N;
-E = simul(theta,particle_id,t);
-w = prior(theta).*psi(E,theta);
-accepted = ones(size(w));
-save(sprintf('itr%d.mat',t),'t','theta','E','w','particle_id','accepted');
+if ~exist('restart_itr')
+    t=1;
+    theta = samp_prior(N);
+    particle_id = 1:N;
+    E = simul(theta,particle_id,t);
+    w = prior(theta).*psi(E,theta);
+    accepted = ones(size(w));
+    save(sprintf('itr%d.mat',t),'t','theta','E','w','particle_id','accepted');
+else
+    load('itr%d.mat',restart_itr)
+end
 
 M = size(theta,1);
 
@@ -105,14 +113,14 @@ while t < T
     % Jump to proposal with metropolis hastings probability r
     r = zeros(1,N);
     r(pr_star>0) = min(1, (psi(E_star,theta_star(:,pr_star > 0)).*pr_star(pr_star>0)) ./ (psi(E(pr_star>0),theta(:,pr_star>0)).*prior(theta(:,pr_star>0)) ));
-    r
+    
     accepted = rand(1,N) < r;
     theta(:,accepted) = theta_star(:,accepted);
     
     E(accepted) = E_star(accepted(pr_star > 0));
 
     if t == burnin
-        theta(freeze_mask,:) = median(theta(freeze_mask,:));
+        theta(freeze_mask,:) = min(theta(freeze_mask,:));
     end
             
     w = prior(theta) .* psi(E,theta);
